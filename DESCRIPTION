@@ -1,13 +1,19 @@
 Package: nchr
 Title: Interface to 2ch
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Hiroki",
            family = "Yagi",
            role = c("aut", "cre"),
            email = "hiro.yagi0245@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Scraping 2ch contents with R.
+Description: 2ch scraping tools in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports:
+    magrittr,
+    rvest,
+    xml2,
+    dplyr,
+    stringr

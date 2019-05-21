@@ -1,8 +1,36 @@
-menu_url <- "http://2ch.sc/bbsmenu.html"
+get_2ch_menu <- function(menu_url = "http://2ch.sc/bbsmenu.html") {
+  a <- xml2::read_html(menu_url) %>%
+    html_nodes("a")
+  tibble(name = a %>% html_text(), url = a %>% html_attr("href")) %>%
+    distinct(url, .keep_all = TRUE) %>%
+    mutate(board_name= stringr::str_match(url, "/(\\w+)/$") %>% `[`(,2))
+}
 
-a <- read_html(menu_url) %>%
-  html_nodes("a")
+read_url <- function(board_name, subpath = "") {
+  stringr::str_c("http://2ch.sc/test/read.cgi", board_name, subpath, sep = "/")
+}
 
-tibble(name = a %>% html_text(), url = a %>% html_attr("href")) %>%
-  distinct(url, .keep_all = TRUE)
+get_2ch_threads <- function(board_name) {
+  url <- get_2ch_menu() %>% filter(board_name== !!board_name) %>% `$`(url)
+  if (identical(url, character(0))) {
+    stop(stringr::str_c(board_name, " is not exists."))
+  }
+  a <- xml2::read_html(stringr::str_c(url, "subback.html")) %>%
+    html_nodes("small#trad > a")
+  tibble(subpath = a %>% html_attr("href") %>% stringr::str_remove("/l\\d+$"),
+         url = read_url(board_name, subpath),
+         title = a %>% html_text()) %>%
+    select(title, url, subpath)
+}
 
+read_2ch_thread <- function(url) {
+  text <- xml2::read_html(url)
+  tibble(
+    dt = text %>% html_nodes("dl.thread > dt") %>% html_text(),
+    dd = text %>% html_nodes("dl.thread > dd") %>% html_text()
+  )
+}
+
+## Local Variables:
+## ess-r-package--project-cache: (nchr . "/Users/yagihiroki/Projects/Rpackages/nchr/")
+## End:
