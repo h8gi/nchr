@@ -10,6 +10,10 @@ read_url <- function(board_name, subpath = "") {
   stringr::str_c("http://2ch.sc/test/read.cgi", board_name, subpath, sep = "/")
 }
 
+parse_thread_title <- function(title) {
+  stringr::str_match(title, "^(\\d): (.*) \\((\\d+)\\)$")
+}
+
 get_2ch_threads <- function(board_name) {
   url <- get_2ch_menu() %>% filter(board_name== !!board_name) %>% `$`(url)
   if (identical(url, character(0))) {
