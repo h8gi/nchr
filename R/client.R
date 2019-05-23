@@ -32,5 +32,5 @@ read_2ch_thread <- function(url) {
 }
 
 ## Local Variables:
-## ess-r-package--project-cache: (nchr . "/Users/yagihiroki/Projects/Rpackages/nchr/")
+## ess-r-package--project-cache: (nchr . "~/Projects/Rpackages/nchr/")
 ## End:
