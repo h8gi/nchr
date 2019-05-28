@@ -17,4 +17,5 @@ Imports:
     xml2,
     dplyr,
     stringr,
-    R6
+    R6,
+    urltools
