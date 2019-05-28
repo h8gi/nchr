@@ -1,4 +1,4 @@
-get_2ch_menu <- function(menu_url = "http://2ch.sc/bbsmenu.html") {
+get_2ch_menu <- function(menu_url) {  
   a <- xml2::read_html(menu_url) %>%
     html_nodes("a")
   tibble(name = a %>% html_text(), url = a %>% html_attr("href")) %>%
@@ -6,7 +6,8 @@ get_2ch_menu <- function(menu_url = "http://2ch.sc/bbsmenu.html") {
     mutate(board_name= stringr::str_match(url, "/(\\w+)/$") %>% `[`(,2))
 }
 
-read_url <- function(board_name, subpath = "") {
+read_url <- function(server_url, board_name, subpath = "") {
+  
   stringr::str_c("http://2ch.sc/test/read.cgi", board_name, subpath, sep = "/")
 }
 
@@ -34,6 +35,19 @@ read_2ch_thread <- function(url) {
     dd = text %>% html_nodes("dl.thread > dd") %>% html_text()
   )
 }
+
+NchClient <- R6Class("NchClient", list(
+  initialize = function(server_url = "http://2ch.sc") {
+    ## stopifnot
+    self$server_url = server_url
+  },
+  get_menu = function() {
+    if (is.null(self$menu)) {
+      self$menu = get_2ch_menu(self$menu_url)
+    }
+    self$menu
+  }
+))
 
 ## Local Variables:
 ## ess-r-package--project-cache: (nchr . "~/Projects/Rpackages/nchr/")

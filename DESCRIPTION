@@ -16,4 +16,5 @@ Imports:
     rvest,
     xml2,
     dplyr,
-    stringr
+    stringr,
+    R6
