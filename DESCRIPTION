@@ -11,6 +11,8 @@ Description: 2ch scraping tools in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/h8gi/nchr
+BugReports: https://github.com/h8gi/nchr/issues
 Imports:
     magrittr,
     rvest,
@@ -21,5 +23,5 @@ Imports:
     urltools,
     tidyr
 RoxygenNote: 6.1.1
-Suggests: 
+Suggests:
     testthat
