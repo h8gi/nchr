@@ -1,3 +1,10 @@
+#' Get 2ch menu from 'bbsmenu.html'
+#'
+#' @param server_url A string.
+#' @param encoding A string.
+#' @return The menu object.
+#' @examples
+#' get_2ch_menu("http://2ch.sc")
 get_2ch_menu <- function(server_url, encoding = "Shift_JIS") {
   menu_url <- stringr::str_c(server_url, "bbsmenu.html", sep = "/")
   a <- xml2::read_html(menu_url, encoding) %>%
@@ -41,6 +48,14 @@ read_2ch_thread <- function(url) {
   )
 }
 
+
+#' nch clinet R6 class
+#'
+#' @docType class
+#' @export
+#' @format An \code{\link{R6Class}} generator object
+#' @keywords data
+#' @importFrom tidyr unnest
 NchClient <- R6Class("NchClient",
   public = list(
     server_url = NULL,
@@ -57,7 +72,7 @@ NchClient <- R6Class("NchClient",
             board_id = board_id,
             threads = list(th))
       }
-      private$.threadsCache %>% filter(board_id == !!board_id)
+      private$.threadsCache %>% filter(board_id == !!board_id) %>% unnest
     }
   ),
   active = list(
@@ -77,7 +92,3 @@ NchClient <- R6Class("NchClient",
     .threadsCache = tibble(board_id = character(0), threads = list(tibble()))
   )
 )
-
-## Local Variables:
-## ess-r-package--project-cache: (nchr . "~/Projects/Rpackages/nchr/")
-## End:

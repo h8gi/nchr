@@ -18,4 +18,8 @@ Imports:
     dplyr,
     stringr,
     R6,
-    urltools
+    urltools,
+    tidyr
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
