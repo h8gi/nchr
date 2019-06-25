@@ -11,9 +11,10 @@ get_2ch_menu <- function(server_url, encoding = "Shift_JIS") {
     html_nodes("a")
   tibble(
     name = a %>% html_text(),
-    url = a %>% html_attr("href")) %>%
+    url = a %>% html_attr("href")
+  ) %>%
     distinct(url, .keep_all = TRUE) %>%
-    mutate(board_id = stringr::str_match(url, "/(\\w+)/$") %>% `[`(,2))
+    mutate(board_id = stringr::str_match(url, "/(\\w+)/$") %>% `[`(, 2))
 }
 
 make_read_url <- function(server_url, board_id, thread_id = "") {
@@ -21,11 +22,13 @@ make_read_url <- function(server_url, board_id, thread_id = "") {
 }
 
 parse_thread_title <- function(title) {
-  stringr::str_match(title, "^\\d: (.*) (\\[\\d+\\] )?\\((\\d+)\\)$")[1,]
+  stringr::str_match(title, "^\\d: (.*) (\\[\\d+\\] )?\\((\\d+)\\)$")[1, ]
 }
 
 get_2ch_threads <- function(menu, board_id, encoding = "Shift_JIS") {
-  board_url <- menu %>% filter(board_id == !!board_id) %>% `$`(url)
+  board_url <- menu %>%
+    filter(board_id == !!board_id) %>%
+    `$`(url)
   if (identical(board_url, character(0))) {
     stop(stringr::str_c("Board '", board_id, "' is not exists."))
   }
@@ -34,9 +37,11 @@ get_2ch_threads <- function(menu, board_id, encoding = "Shift_JIS") {
 
   a <- xml2::read_html(stringr::str_c(board_url, "subback.html"), encoding) %>%
     html_nodes("small#trad > a")
-  tibble(thread_id = a %>% html_attr("href") %>% stringr::str_remove("/l\\d+$"),
-         url = make_read_url(server_url, board_id, thread_id),
-         title = a %>% html_text()) %>%
+  tibble(
+    thread_id = a %>% html_attr("href") %>% stringr::str_remove("/l\\d+$"),
+    url = make_read_url(server_url, board_id, thread_id),
+    title = a %>% html_text()
+  ) %>%
     select(title, url, thread_id)
 }
 
@@ -61,34 +66,37 @@ NchClient <- R6Class("NchClient",
     server_url = NULL,
     initialize = function(server_url = "http://2ch.sc") {
       ## stopifnot
-      self$server_url = server_url
+      self$server_url <- server_url
     },
     threads = function(board_id) {
-      threads <- private$.threadsCache %>% filter(board_id == !!board_id)
+      threads <- private$threads_cache %>% filter(board_id == !!board_id)
       if (nrow(threads) == 0) { ## not cached
         th <- get_2ch_threads(self$menu, board_id)
-        private$.threadsCache =
-          add_row(private$.threadsCache,
+        private$threads_cache <-
+          add_row(private$threads_cache,
             board_id = board_id,
-            threads = list(th))
+            threads = list(th)
+          )
       }
-      private$.threadsCache %>% filter(board_id == !!board_id) %>% unnest
+      private$threads_cache %>%
+        filter(board_id == !!board_id) %>%
+        unnest()
     }
   ),
   active = list(
     menu = function(value) {
       if (missing(value)) {
-        if (is.null(private$.menuCache)) {
-          private$.menuCache = get_2ch_menu(self$server_url)
+        if (is.null(private$menu_cache)) {
+          private$menu_cache <- get_2ch_menu(self$server_url)
         }
-        private$.menuCache
+        private$menu_cache
       } else {
         stop("Can't set `$menu`", call. = FALSE)
       }
     }
   ),
   private = list(
-    .menuCache = NULL,
-    .threadsCache = tibble(board_id = character(0), threads = list(tibble()))
+    menu_cache = NULL,
+    threads_cache = tibble(board_id = character(0), threads = list(tibble()))
   )
 )
